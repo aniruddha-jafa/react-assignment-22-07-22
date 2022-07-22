@@ -7,6 +7,7 @@ import { ChakraProvider } from "@chakra-ui/react"
 import "./index.css"
 
 // custom components
+import { PostProvider } from "context/PostProvider"
 import App from "./App"
 
 // ----------------------------------------------------------------
@@ -15,7 +16,9 @@ const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 root.render(
   <React.StrictMode>
     <ChakraProvider>
-      <App />
+      <PostProvider>
+        <App />
+      </PostProvider>
     </ChakraProvider>
   </React.StrictMode>
 )
