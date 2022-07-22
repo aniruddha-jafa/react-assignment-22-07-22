@@ -6,4 +6,11 @@ type Post = {
     body: string,
 }
 
-export type { Post }
+type PostSummary = {
+    id: number,
+    userId: number,
+    title: string,
+    completed: boolean,
+}
+
+export type { Post, PostSummary }
