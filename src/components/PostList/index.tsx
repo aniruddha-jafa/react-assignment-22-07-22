@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react"
-import { usePosts } from "hooks"
+import { useEffect, useContext } from "react"
+import { fetchJSON } from "utils"
 
-import { Outlet, Link as ReactRouterLink } from "react-router-dom"
+import { useNavigate, Outlet, Link as ReactRouterLink } from "react-router-dom"
+import { PostContext } from "context/PostProvider"
 
 // components
 import {
@@ -29,6 +30,7 @@ import type { Post } from "types"
 const PostListItem = ({ id, userId, title, body }: Post) => (
   <>
     <Tr>
+      <Td textAlign='center'>{id}</Td>
       <Td maxW='32ch'>
         <LinkBox>
           <LinkOverlay as={ReactRouterLink} to={`/post/${id}`}>
@@ -47,19 +49,35 @@ const PostListItem = ({ id, userId, title, body }: Post) => (
 )
 
 const PostList = () => {
-  const { loading, error, posts: postData } = usePosts()
-  const [posts, setPosts] = useState<Post[]>([])
+  // const { loading, error, posts: postData = null } = usePosts()
+  const {
+    loading,
+    error,
+    posts = [],
+    setLoading,
+    setPosts,
+    setError,
+  } = useContext(PostContext)
+  const navigate = useNavigate()
 
   useEffect(() => {
-    setPosts(postData)
-  }, [postData])
+    // only fetch if not posts
+    if (posts?.length === 0) {
+      setLoading(true)
+
+      fetchJSON("https://jsonplaceholder.typicode.com/posts")
+        .then((data) => setPosts(data))
+        .catch((err: Error) => setError(err.message))
+        .finally(() => setLoading(false))
+    }
+  }, [posts, setLoading, setPosts, setError])
 
   if (error) {
     return <p>error: {error}</p>
   }
 
   const addPost = async (event: React.MouseEvent) => {
-    // setPosts([...posts, { id: 3, userId:100, title: 'Hello', body: 'World' }])
+    navigate(`/post/${posts?.length + 1 || 0}`)
   }
 
   return (
@@ -77,6 +95,7 @@ const PostList = () => {
             <Table>
               <Thead>
                 <Tr>
+                  <Th>Sno</Th>
                   <Th>Title</Th>
                   <Th>UserId</Th>
                   <Th>Body</Th>

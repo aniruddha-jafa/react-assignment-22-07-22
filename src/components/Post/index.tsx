@@ -1,4 +1,4 @@
-import { usePost } from "hooks"
+import { usePost } from "utils"
 import { useParams } from "react-router-dom"
 
 // components
