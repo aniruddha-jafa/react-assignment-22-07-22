@@ -1,17 +1,32 @@
-import React from 'react';
-import { ChakraProvider } from '@chakra-ui/react'
-import PostList from 'components/PostList';
+import React from "react"
 
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom"
+
+import DefaultLayout from "components/Layouts"
+import Post from "components/Post"
+import PostList from "components/PostList"
 
 function App() {
-
   return (
     <>
-      <ChakraProvider>
-        <PostList/>
-      </ChakraProvider>
+      <DefaultLayout>
+        <BrowserRouter>
+          <Routes>
+            <Route index element={<PostList />} />
+            <Route path='post/:postId' element={<Post />} />
+            <Route
+              path='*'
+              element={
+                <main style={{ padding: "1rem" }}>
+                  <p>Error 404</p>
+                </main>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </DefaultLayout>
     </>
-  );
+  )
 }
 
-export default App;
+export default App
