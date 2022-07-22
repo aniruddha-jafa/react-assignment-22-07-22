@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react"
 import { usePosts } from "hooks"
 
-import { Outlet } from "react-router-dom"
+import { Outlet, Link as ReactRouterLink } from "react-router-dom"
 
 // components
 import {
   Button,
   Container,
+  Flex,
   Text,
+  Link,
+  LinkBox,
+  LinkOverlay,
   Table,
   Thead,
   Tbody,
@@ -26,9 +30,13 @@ const PostListItem = ({ id, userId, title, body }: Post) => (
   <>
     <Tr>
       <Td maxW='32ch'>
-        <Text textAlign={"left"} noOfLines={1}>
-          {title}
-        </Text>
+        <LinkBox>
+          <LinkOverlay as={ReactRouterLink} to={`/post/${id}`}>
+            <Text textAlign={"left"} noOfLines={1}>
+              {title}
+            </Text>
+          </LinkOverlay>
+        </LinkBox>
       </Td>
       <Td textAlign='center'>{userId}</Td>
       <Td maxW='64ch'>
@@ -59,9 +67,11 @@ const PostList = () => {
 
   return (
     <>
-      <Container maxW='6xl' border='solid 1px green' my={16}>
-        <Button onClick={addPost}>add post</Button>
-        <TableContainer>
+      <Container maxW='6xl' my={16}>
+        <Flex justifyContent='flex-start'>
+          <Button onClick={addPost}>New</Button>
+        </Flex>
+        <TableContainer mt='12'>
           <Table>
             <Thead>
               <Tr>
