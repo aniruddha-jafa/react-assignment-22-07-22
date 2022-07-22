@@ -9,7 +9,7 @@ import {
   Container,
   Flex,
   Text,
-  Link,
+  Spinner,
   LinkBox,
   LinkOverlay,
   Table,
@@ -57,9 +57,6 @@ const PostList = () => {
   if (error) {
     return <p>error: {error}</p>
   }
-  if (loading) {
-    return <p>loading...</p>
-  }
 
   const addPost = async (event: React.MouseEvent) => {
     // setPosts([...posts, { id: 3, userId:100, title: 'Hello', body: 'World' }])
@@ -71,18 +68,22 @@ const PostList = () => {
         <Flex justifyContent='flex-start'>
           <Button onClick={addPost}>New</Button>
         </Flex>
-        <TableContainer mt='12'>
-          <Table>
-            <Thead>
-              <Tr>
-                <Th>Title</Th>
-                <Th>UserId</Th>
-                <Th>Body</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {posts &&
-                posts.map((post) => (
+        {loading || !posts ? (
+          <Flex justifyContent='center'>
+            <Spinner size='xl' />
+          </Flex>
+        ) : (
+          <TableContainer mt='12'>
+            <Table>
+              <Thead>
+                <Tr>
+                  <Th>Title</Th>
+                  <Th>UserId</Th>
+                  <Th>Body</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {posts.map((post) => (
                   <PostListItem
                     key={post.id}
                     id={post.id}
@@ -91,9 +92,10 @@ const PostList = () => {
                     body={post.body}
                   />
                 ))}
-            </Tbody>
-          </Table>
-        </TableContainer>
+              </Tbody>
+            </Table>
+          </TableContainer>
+        )}
       </Container>
       <Outlet />
     </>
