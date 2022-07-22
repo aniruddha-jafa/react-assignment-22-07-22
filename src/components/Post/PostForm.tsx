@@ -1,4 +1,5 @@
-import React, { useReducer, useContext, useMemo, useCallback } from "react"
+import React, { useReducer, useContext, useCallback } from "react"
+import { useNavigate } from "react-router-dom"
 
 import {
   Button,
@@ -39,6 +40,9 @@ const postFormReducer = (state: typeof initialState, action: ActionType) => {
   }
 }
 
+// hack -> since server doesn't update posts
+const isNewPost = (id: number) => !(id <= 100)
+
 export function PostForm({
   id = 0,
   title = "",
@@ -47,50 +51,56 @@ export function PostForm({
 }: PostType) {
   const postContext = useContext(PostContext)
   const { dispatch } = postContext
-  const postUrl = useMemo(
-    () => `https://jsonplaceholder.typicode.com/posts/${id}`,
-    [id]
-  )
+  const postUrl = `https://jsonplaceholder.typicode.com/posts/${id}`
 
   const [formState, postFormDispatch] = useReducer(postFormReducer, {
     title,
     body,
   })
 
+  const navigate = useNavigate()
+
   const onDelete = useCallback(
     async (e: React.MouseEvent) => {
       if (!id) {
         return
       }
-      alert("Deleting note!")
-      const res = await fetch(postUrl, {
+      alert("Deleting note! \n Page will reload to posts list")
+      await fetch(postUrl, {
         method: "DELETE",
       })
       dispatch({ type: "REMOVE_POST", payload: id })
+      navigate("/")
     },
-    [dispatch, id, postUrl]
+    [dispatch, navigate, id, postUrl]
   )
 
   const onSubmit = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault()
-      const data = JSON.stringify({
+      const postData = {
         id,
         userId,
         title: formState.title,
         body: formState.body,
-      })
+      }
+      const data = JSON.stringify(postData)
+      const isNew = isNewPost(id)
       alert(`Submitting data: ${data}`)
       fetch(postUrl, {
-        method: "PUT",
+        method: isNew ? "POST" : "PUT",
         body: data,
       })
+      if (isNew) {
+        dispatch({ type: "ADD_POST", payload: postData })
+      } else {
+        dispatch({ type: "SET_POST", payload: postData })
+      }
     },
-    [postUrl, id, userId, formState]
+    [postUrl, id, userId, formState, dispatch]
   )
   const setTitle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault()
-    console.log("target val is: ", e.target.value)
     postFormDispatch({ type: "SET_TITLE", payload: e.target.value })
   }, [])
 
@@ -118,7 +128,7 @@ export function PostForm({
       </FormControl>
       <Flex pt='4' gap='4'>
         <Button colorScheme='blue' type='submit' onClick={onSubmit}>
-          Update
+          Save
         </Button>
         <Button colorScheme='red' onClick={onDelete}>
           Delete

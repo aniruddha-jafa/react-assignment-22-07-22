@@ -10,6 +10,9 @@ interface IPostState {
   posts: Post[]
   post: Post | null
   error: string
+  setLoading: (value: boolean) => void
+  setError: (value: string) => void
+  setPosts: (value: Post[]) => void
 }
 
 const initialState: IPostState = {
@@ -17,6 +20,9 @@ const initialState: IPostState = {
   posts: [],
   post: null,
   error: "",
+  setLoading: (value) => {},
+  setError: (value) => {},
+  setPosts: (value) => {},
 }
 
 type ActionType =
@@ -35,6 +41,11 @@ function postReducer(state: IPostState, action: ActionType) {
         ...state,
         loading: payload,
       }
+    case "SET_ERROR":
+      return {
+        ...state,
+        error: payload,
+      }
     case "SET_POSTS":
       return {
         ...state,
@@ -44,11 +55,6 @@ function postReducer(state: IPostState, action: ActionType) {
       return {
         ...state,
         post: payload,
-      }
-    case "SET_ERROR":
-      return {
-        ...state,
-        error: payload,
       }
     case "REMOVE_POST":
       return {
@@ -71,16 +77,25 @@ type props = {
 
 function PostProvider({ children }: props) {
   const [state, dispatch] = useReducer(postReducer, initialState)
-  const { loading, posts, post, error } = state
+
+  const setLoading = (val: boolean) =>
+    dispatch({ type: "SET_LOADING", payload: val })
+  const setPosts = (data: Post[]) =>
+    dispatch({ type: "SET_POSTS", payload: data })
+  const setError = (err: string) =>
+    dispatch({ type: "SET_ERROR", payload: err })
 
   return (
     <PostContext.Provider
       value={{
-        loading,
-        posts,
-        post,
-        error,
+        loading: state.loading,
+        error: state.error,
+        posts: state.posts,
+        post: state.post,
         dispatch,
+        setLoading,
+        setPosts,
+        setError,
       }}
     >
       {children}
