@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import { usePosts } from "hooks"
 
+import { Outlet } from "react-router-dom"
+
 // components
 import {
   Button,
@@ -16,27 +18,29 @@ import {
 } from "@chakra-ui/react"
 
 // types
-import type { PostSummary } from "types"
+import type { Post } from "types"
 
 //----------------------------------------------------------------
 
-const PostListItem = ({ id, userId, title, completed }: PostSummary) => (
+const PostListItem = ({ id, userId, title, body }: Post) => (
   <>
     <Tr>
-      <Td>
+      <Td maxW='32ch'>
         <Text textAlign={"left"} noOfLines={1}>
           {title}
         </Text>
       </Td>
       <Td textAlign='center'>{userId}</Td>
-      <Td textAlign='center'>{completed ? "Yes" : "No"}</Td>
+      <Td maxW='64ch'>
+        <Text noOfLines={1}>{body}</Text>
+      </Td>
     </Tr>
   </>
 )
 
 const PostList = () => {
   const { loading, error, posts: postData } = usePosts()
-  const [posts, setPosts] = useState<PostSummary[]>([])
+  const [posts, setPosts] = useState<Post[]>([])
 
   useEffect(() => {
     setPosts(postData)
@@ -55,7 +59,7 @@ const PostList = () => {
 
   return (
     <>
-      <Container maxW='4xl' border='solid 1px green'>
+      <Container maxW='6xl' border='solid 1px green' my={16}>
         <Button onClick={addPost}>add post</Button>
         <TableContainer>
           <Table>
@@ -63,7 +67,7 @@ const PostList = () => {
               <Tr>
                 <Th>Title</Th>
                 <Th>UserId</Th>
-                <Th>Completed</Th>
+                <Th>Body</Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -74,13 +78,14 @@ const PostList = () => {
                     id={post.id}
                     userId={post.userId}
                     title={post.title}
-                    completed={post.completed}
+                    body={post.body}
                   />
                 ))}
             </Tbody>
           </Table>
         </TableContainer>
       </Container>
+      <Outlet />
     </>
   )
 }
